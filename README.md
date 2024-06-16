@@ -7,7 +7,7 @@
 
 ## Technologies
 
-React, Redux, Tanstack-query, React-hook-form with Zod, Storybook, Jest ...
+React, Redux, json-server,  Tanstack-query, React-hook-form with Zod, Storybook, Jest ...
 
 ## Running Locally
 
