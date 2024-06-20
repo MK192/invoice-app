@@ -10,7 +10,7 @@ export default function useDarkSide() {
 
     const preferedTheme = prefersDark ? 'dark' : prefersLight ? 'light' : false;
 
-    const [theme, setTheme] = useState(
+    const [theme, setTheme] = useState<string>(
         localStorage.theme ? localStorage.theme : preferedTheme,
     );
     const colorTheme = theme === 'dark' ? 'light' : 'dark';
@@ -21,5 +21,5 @@ export default function useDarkSide() {
         root.classList.add(theme);
         localStorage.setItem('theme', theme);
     }, [colorTheme, theme]);
-    return [colorTheme, setTheme];
+    return [colorTheme, setTheme] as const;
 }

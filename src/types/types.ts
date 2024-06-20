@@ -90,3 +90,11 @@ export type InvoiceSliceType = {
         filteredInvoices: InvoiceType[] | [];
     };
 };
+
+export type InvoiceStateType = {
+    invoices: InvoiceType[];
+    singleInvoice: InvoiceType | null;
+    activeFilter: string;
+    selectedFilter: boolean[];
+    filteredInvoices: InvoiceType[] | [];
+};
