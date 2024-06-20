@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import deepFreeze from 'deep-freeze';
 import reducer, { invoiceSlice } from '../redux/invoiceSlice';
 
@@ -56,6 +57,7 @@ describe('testing invoiceSlice from redux', () => {
         ],
         total: 102.04,
     };
+
     it('should add new invoice in redux - invoiceSlice', async () => {
         deepFreeze(initialObject);
 

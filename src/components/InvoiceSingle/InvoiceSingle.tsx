@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // Component
 import { Nav } from '../Nav';
@@ -27,16 +27,15 @@ import { InvoiceSliceType } from '../../types/types';
 import { invalidateInactive } from '../../utils/functions';
 
 const InvoiceSingle = () => {
-    const { id } = useLoaderData();
-    const { invoiceId } = id.params;
+    const id = useParams();
+    const { invoiceId } = id;
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
     let selectedInvoice = useSelector(
         (state: InvoiceSliceType) => state.invoice.singleInvoice,
     );
     const [showForm, setShowForm] = useState<boolean>(false);
-
     const {
         isLoading,
         isError,

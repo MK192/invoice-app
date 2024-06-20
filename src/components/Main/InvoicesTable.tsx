@@ -10,20 +10,13 @@ type Props = {
     filteredInvoices: InvoiceType[];
 };
 
-export async function loader(id: string) {
-    return { id };
-}
-
 const InvoicesTable = ({ filteredInvoices }: Props) => {
     return (
         <div className="mt-16 md:w-full ">
             {filteredInvoices &&
                 filteredInvoices.map((invoice) => {
                     return (
-                        <div
-                            key={invoice.id}
-                            onClick={() => loader(invoice.id)}
-                        >
+                        <div key={invoice.id}>
                             <Link to={`invoice/${invoice.id}`}>
                                 <Invoice invoice={invoice} />
                             </Link>
