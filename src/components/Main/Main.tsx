@@ -28,17 +28,15 @@ const Main = ({ setShowForm }: Props) => {
         (state: InvoiceSliceType) => state.invoice.filteredInvoices,
     );
     const dispatch = useDispatch();
+
     const { isLoading } = useQuery({
         queryKey: ['invoices', ...selectedFilter],
-
         refetchOnWindowFocus: false,
         queryFn: () =>
             fetch(`http://localhost:3004/invoices`).then(async (res) => {
                 const data = await res.json();
                 dispatch(fetchInvoices(data));
-
                 console.log('fetch');
-
                 return data;
             }),
         staleTime: 10000000,

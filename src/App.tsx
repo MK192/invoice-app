@@ -1,10 +1,11 @@
+import { useState } from 'react';
+
 // Components
 import Main from './components/Main/Main';
 import { Form } from './components/Form';
 import { Nav } from './components/Nav';
 // Css
 import './App.css';
-import { useState } from 'react';
 
 function App() {
     const [showForm, setShowForm] = useState<boolean>(false);

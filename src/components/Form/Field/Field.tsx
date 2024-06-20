@@ -10,8 +10,8 @@ type Props = {
     defaultvalue: string | number | undefined;
     handleChange?: (e: number) => void;
 };
-
-const Field = forwardRef<HTMLInputElement, Props>(
+type HTMLElement = HTMLInputElement | HTMLSelectElement;
+const Field = forwardRef<HTMLElement, Props>(
     (
         {
             labelName,
@@ -33,7 +33,7 @@ const Field = forwardRef<HTMLInputElement, Props>(
         ];
         const [selected, setSelected] = useState(options[3].text);
         const [showErrorMsg, setShowErrorMsg] = useState(true);
-        const myElementRef = useRef(null);
+        const myElementRef = useRef<HTMLDivElement>(null);
 
         useEffect(() => {
             // calculate is there a place for error msg to diplay it or just to change color of border
@@ -76,7 +76,7 @@ const Field = forwardRef<HTMLInputElement, Props>(
                         }
                         {...other}
                         defaultValue={defaultvalue}
-                        ref={ref}
+                        ref={ref as React.RefObject<HTMLInputElement>}
                     />
                 ) : (
                     <div className="relative">
@@ -84,7 +84,7 @@ const Field = forwardRef<HTMLInputElement, Props>(
                             className="border-[1px] z-10 w-full border-selago rounded hover:border-cornflowerBlue h-12 pl-[20px] text-black font-bold appearance-none dark:bg-ebonyClay dark:text-white dark:border-ebonyClay dark:hover:border-cornflowerBlue"
                             value={selected}
                             {...other}
-                            ref={ref}
+                            ref={ref as React.RefObject<HTMLSelectElement>}
                             onChange={(e) => setSelected(e.target.value)}
                         >
                             {options.map((option) => {

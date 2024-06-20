@@ -27,7 +27,7 @@ type Props = {
 };
 
 const Form = ({ setShowForm, invoice }: Props) => {
-    const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLFormElement>(null);
 
     const {
         register,

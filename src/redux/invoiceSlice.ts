@@ -1,19 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 // Type
-import { InvoiceType } from '../types/types';
+import { InvoiceStateType, InvoiceType } from '../types/types';
+
 // Functions
 import { generateId, invoiceTotal } from '../utils/functions';
 
+const initialState: InvoiceStateType = {
+    invoices: [],
+    singleInvoice: null,
+    activeFilter: '',
+    selectedFilter: [false, false, false],
+    filteredInvoices: [],
+};
 export const invoiceSlice = createSlice({
     name: 'invoice',
-    initialState: {
-        invoices: [],
-        singleInvoice: null,
-        activeFilter: '',
-        selectedFilter: [false, false, false],
-        filteredInvoices: [],
-    },
+    initialState: initialState,
 
     reducers: {
         // fetching invoices from json server
@@ -31,13 +33,11 @@ export const invoiceSlice = createSlice({
             state.filteredInvoices = action.payload;
         },
         // add new invoice
-        addInvoice: (state, action) => {
+        addInvoice: (state: InvoiceStateType, action) => {
             const paymentTerms = parseInt(
                 action.payload[0]?.payment_terms?.match(/\d+/)[0],
                 10,
             );
-            console.log(action.payload[0]);
-            // console.log(action.payload[0].invoice_date);
             const dateObject = new Date(action.payload[0].invoice_date);
             /* buttonType get name of button that is clicked because status depend on that.
             If save as draft button is clicked invoice status is draft, save and
@@ -52,7 +52,7 @@ export const invoiceSlice = createSlice({
             const newId = generateId();
             const total = invoiceTotal(action.payload[0].item_column);
 
-            const newInvoice = {
+            const newInvoice: InvoiceType = {
                 id: newId,
                 createdAt: action.payload[0].invoice_date,
                 paymentDue: paymentDue,
@@ -93,7 +93,7 @@ export const invoiceSlice = createSlice({
                     return response.json();
                 })
                 .then((data) => {
-                    //     console.log('Invoce posted successfully:', data);
+                    console.log('Invoce posted successfully:', data);
                 });
 
             /* inicijalno ako se ne uradi filter filteredInvoices ce biti
@@ -104,9 +104,7 @@ export const invoiceSlice = createSlice({
                 state.filteredInvoices?.length === 0
                     ? state.invoices
                     : state.filteredInvoices;
-            if (state.filteredInvoices?.status === state.activeFilter) {
-                state.filteredInvoices?.push(newInvoice);
-            }
+
             state.invoices?.push(newInvoice);
         },
         // delete selected invoice
@@ -130,24 +128,22 @@ export const invoiceSlice = createSlice({
                 });
 
             state.filteredInvoices = state.filteredInvoices.filter(
-                (invoice) => invoice.id !== action.payload,
+                (invoice: InvoiceType) => invoice.id !== action.payload,
             );
             state.invoices = state.invoices.filter(
-                (invoice) => invoice.id !== action.payload,
+                (invoice: InvoiceType) => invoice.id !== action.payload,
             );
         },
 
         // function to edit invoice
-        editInvoice: (state, action) => {
+        editInvoice: (state: InvoiceStateType, action) => {
             const formvalues = action.payload[0];
             const id = action.payload[1];
             const queryClient = action.payload[2];
-            // console.log(formvalues);
             const paymentTerms = parseInt(
                 formvalues?.payment_terms?.match(/\d+/)[0],
                 10,
             );
-
             const dateObject = new Date(formvalues?.invoice_date);
 
             // Add the number of days
@@ -157,7 +153,7 @@ export const invoiceSlice = createSlice({
             const paymentDue = dateObject.toISOString().slice(0, 10);
 
             const total = invoiceTotal(formvalues?.item_column);
-            const editedInvoice = {
+            const editedInvoice: InvoiceType = {
                 id: id,
                 createdAt: formvalues?.invoice_date,
                 paymentDue: paymentDue,
@@ -169,7 +165,7 @@ export const invoiceSlice = createSlice({
                 senderAddress: {
                     street: formvalues.street_address_from,
                     city: formvalues.city_from,
-                    postcode: formvalues.postCode_from,
+                    postCode: formvalues.postCode_from,
                     country: formvalues.country_from,
                 },
                 clientAddress: {
@@ -215,47 +211,45 @@ export const invoiceSlice = createSlice({
 
         // change invoice status to paid
         markAsPaid: (state, action) => {
-            console.log(action.payload);
             const invoice = action.payload[0];
             const queryClient = action.payload[1];
-
-            fetch(`http://localhost:3004/invoices/${invoice.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...invoice, status: 'paid' }),
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(
-                            `HTTP error! Status: ${response.status}`,
-                        );
-                    }
-                    return response.json();
+            if (state.singleInvoice && state.singleInvoice.status !== 'paid') {
+                fetch(`http://localhost:3004/invoices/${invoice.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ...invoice, status: 'paid' }),
                 })
-                .then((data) => {
-                    console.log('Item status change to paid:', data);
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(
+                                `HTTP error! Status: ${response.status}`,
+                            );
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        console.log('Item status change to paid:', data);
+                    });
+
+                const targetIndex = state.filteredInvoices.findIndex(
+                    (item: InvoiceType) => item.id === invoice.id,
+                );
+                state.singleInvoice.status = 'paid';
+                state.filteredInvoices[targetIndex].status = 'paid';
+
+                // update data for this query
+                queryClient.setQueryData(['invoice', invoice?.id], {
+                    ...invoice,
+                    status: 'paid',
                 });
-
-            const targetIndex = state.filteredInvoices.findIndex(
-                (item: InvoiceType) => item.id === invoice.id,
-            );
-            state.singleInvoice.status = 'paid';
-            state.filteredInvoices[targetIndex].status = 'paid';
-
-            // update data for this query
-            queryClient.setQueryData(['invoice', invoice?.id], {
-                ...invoice,
-                status: 'paid',
-            });
+            }
         },
         // return filtered invoices
         changeSelectedFilter: (state, action) => {
-            // const array = action.payload;
             const index = action.payload;
             state.selectedFilter[index] = !state.selectedFilter[index];
-            // console.log(action.payload);
             state.filteredInvoices = [];
             if (state.selectedFilter[0]) {
                 state.activeFilter = 'draft';
