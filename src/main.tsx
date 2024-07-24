@@ -12,7 +12,7 @@ import './index.css';
 // Component
 import App from './App.tsx';
 import { InvoiceSingle } from './components/InvoiceSingle';
-
+import { Page404 } from './components/Page404';
 const router = createBrowserRouter([
     {
         path: '/',
@@ -22,6 +22,10 @@ const router = createBrowserRouter([
     {
         path: 'invoice/:invoiceId',
         element: <InvoiceSingle />,
+    },
+    {
+        path: '*',
+        element: <Page404 />,
     },
 ]);
 
